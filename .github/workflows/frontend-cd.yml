@@ -1,4 +1,4 @@
-name: Deploy Frontend to S3
+name: Deploy Frontend to S3 (Monorepo)
 
 on:
   push:
@@ -13,10 +13,10 @@ jobs:
 
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set up Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: 18
 
@@ -29,13 +29,15 @@ jobs:
         run: npm run build
 
       - name: Deploy to S3
-        uses: aws-actions/s3-sync@v2
+        uses: aws-actions/s3-sync@v4
         with:
+          source: hoit-frontend/out
           bucket: ${{ secrets.S3_BUCKET_NAME }}
           region: ${{ secrets.AWS_REGION }}
-          source: hoit-frontend/out
-          dest: /
           delete: true
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+      - name: Deployment Complete
+        run: echo "✅ Frontend deployed successfully to S3!"

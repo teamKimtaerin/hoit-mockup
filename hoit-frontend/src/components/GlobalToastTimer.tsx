@@ -9,7 +9,6 @@ import { useToastTimerStore } from '@/lib/store/toastTimerStore'
  * 페이지 이동과 무관하게 작동합니다.
  */
 export default function GlobalToastTimer() {
-  
   const { checkPendingToast } = useToastTimerStore()
   const intervalRef = useRef<NodeJS.Timeout | null>(null)
 
