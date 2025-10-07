@@ -1,0 +1,48 @@
+# docker-compose.yml
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: hoit-postgres
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: hoit_mockup
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - hoit-network
+
+  backend:
+    build:
+      context: ./hoit-backend
+    container_name: hoit-backend
+    restart: always
+    env_file:
+      - ./hoit-backend/.env
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+    networks:
+      - hoit-network
+
+  frontend:
+    build:
+      context: ./hoit-frontend
+    container_name: hoit-frontend
+    restart: always
+    ports:
+      - "80:3000"
+    depends_on:
+      - backend
+    networks:
+      - hoit-network
+
+volumes:
+  postgres_data:
+
+networks:
+  hoit-network:
+    driver: bridge
