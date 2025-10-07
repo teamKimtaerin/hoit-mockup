@@ -22,7 +22,7 @@ jobs:
 
       - name: Install Dependencies
         working-directory: hoit-frontend
-        run: yarn install --frozen-lockfile
+        run: yarn install --frozen-lockfile --ignore-engines
 
       - name: Build Frontend
         working-directory: hoit-frontend
