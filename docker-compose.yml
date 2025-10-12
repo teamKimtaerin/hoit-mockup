@@ -1,48 +1,17 @@
-# docker-compose.yml
+version: "3.9"
 
 services:
-  postgres:
-    image: postgres:15-alpine
-    container_name: hoit-postgres
-    restart: always
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: hoit_mockup
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    networks:
-      - hoit-network
-
   backend:
     build:
-      context: ./hoit-backend
+      context: .
+      dockerfile: Dockerfile
     container_name: hoit-backend
     restart: always
+    ports:
+      - "8000:8000"
     env_file:
-      - ./hoit-backend/.env
-    ports:
-      - "8080:8080"
-    depends_on:
-      - postgres
-    networks:
-      - hoit-network
-
-  frontend:
-    build:
-      context: ./hoit-frontend
-    container_name: hoit-frontend
-    restart: always
-    ports:
-      - "80:3000"
-    depends_on:
-      - backend
-    networks:
-      - hoit-network
-
-volumes:
-  postgres_data:
-
-networks:
-  hoit-network:
-    driver: bridge
+      - .env
+    volumes:
+      - .:/app
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000
+    depends_on: []
