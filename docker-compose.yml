@@ -1,4 +1,17 @@
 services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: hoit-postgres
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: hoit_mockup
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
   backend:
     build:
       context: ./hoit-backend
@@ -9,15 +22,12 @@ services:
     restart: always
     ports:
       - "8000:8000"
-    environment:
-      - AWS_BEDROCK_ACCESS_KEY_ID=${AWS_BEDROCK_ACCESS_KEY_ID}
-      - AWS_BEDROCK_SECRET_ACCESS_KEY=${AWS_BEDROCK_SECRET_ACCESS_KEY}
-      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
-      - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
-      - GOOGLE_REDIRECT_URI=${GOOGLE_REDIRECT_URI}
     env_file:
       - ./hoit-backend/.env
-    working_dir: /app
+    depends_on:
+      - postgres
+    networks:
+      - hoit-network
     command: >
       gunicorn --workers 4
                --worker-class uvicorn.workers.UvicornWorker
@@ -25,3 +35,10 @@ services:
                --access-logfile -
                --error-logfile -
                app.main:app
+
+volumes:
+  postgres_data:
+
+networks:
+  hoit-network:
+    driver: bridge
